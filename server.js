@@ -8,21 +8,16 @@ require('dotenv').config();
 
 app.use(cors());
 
-// app.get('/', (request, response) =>{
-//   response.send('Server Live!');
-// })
-
 app.get('/location', (request, response) =>{
   let searchQuery = request.query.data;
   const geoData = require('./data/geo.json');
 
   const location = new Location(searchQuery, geoData);
 
-  // console.log(location);
   response.status(200).send(location);
 })
 
-app.get('/weather', (request, respose) => {
+app.get('/weather', (request, response) => {
   const darkskyData = require('./data/darksky.json');
   const tempArr = [];
   
@@ -31,8 +26,7 @@ app.get('/weather', (request, respose) => {
     tempArr.push(tempVar);
   })
 
-  console.log(tempArr);
-  // response.status(200).send(tempArr);
+  response.status(200).send(tempArr);
 })
 
 function Location(searchQuery, geoData){
@@ -53,4 +47,3 @@ Weather.prototype.formattedDate = function(time) {
 }
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
-
