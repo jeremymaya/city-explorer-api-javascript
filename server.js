@@ -31,6 +31,11 @@ function Location(searchQuery, geoDataResults){
 }
 */
 
+app.get('/', (request, response) =>{
+  response.send('Server Live!');
+})
+
+
 app.get('/location', (request, response) =>{
   let searchQuery = request.query.data;
   const geoData = require('./data/geo.json');
@@ -47,8 +52,5 @@ function Location(searchQuery, geoData){
   this.latitude = geoData.results[0].geometry.location.lat;
   this.longitude = geoData.results[0].geometry.location.lng;
 }
-
-
-
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
