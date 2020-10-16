@@ -2,6 +2,8 @@
 
 Author: Kyungrae Kim
 
+Endpoint: <https://city-explorer-api-javascript.herokuapp.com>
+
 ---
 
 ## Overview
@@ -58,15 +60,21 @@ Start the application in development mode with the following command:
 node server.js
 ```
 
+Access the endpoint running at <http://localhost:3000>
+
 ### Production Mode
 
-Create a new Heroku app by clicking `New`
+Create a new Heroku app by clicking `New`.
 
-After the app has been created, go to the `Deploy` tab and select GitHub as `Deployment method`
+After the app has been created, go to the `Deploy` tab and select GitHub as `Deployment method`.
 
-Connect the correct repository from GitHub and choose the right branch to deploy
+Connect the correct repository from GitHub and choose the right branch to deploy.
 
-Click `Deploy Branch`
+Click `Deploy Branch`.
+
+Access the endpoint running at <https://APP_NAME.herokuapp.com>.
+
+The endpoint deployed from this project is accessible at <https://city-explorer-api-javascript.herokuapp.com>
 
 ---
 
