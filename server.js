@@ -15,6 +15,7 @@ app.use(cors());
 // API routes
 app.get('/location', handleLocation)
 app.get('/weather', handleWeather)
+
 app.use('*', handleCatchAll);
 
 // Handler function for the GET /location route
@@ -42,9 +43,9 @@ function Location(city, geoData) {
 
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
-function handleWeather(request, response) {
+function handleWeather(response) {
     try {
-        const darkskyData = require('./data/darksky.json');
+        const darkskyData = require('./data/weather.json');
         const forecast = [];
         
         darkskyData.forEach(obj => {
@@ -76,7 +77,7 @@ function handleInternalError(error) {
     response.status(500).send('So sorry, something went wrong.');
 }
 
-function handleCatchAll(request, response) {
+function handleCatchAll(response) {
     response.status(404).send('Not Found!');
 }
 
