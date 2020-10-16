@@ -42,7 +42,7 @@ function Location(city, geoData) {
 
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
-function handleWeather(response) {
+function handleWeather(request, response) {
     try {
         const darkskyData = require('./data/darksky.json');
         const forecast = [];
@@ -76,7 +76,7 @@ function handleInternalError(error) {
     response.status(500).send('So sorry, something went wrong.');
 }
 
-function handleCatchAll(response) {
+function handleCatchAll(request, response) {
     response.status(404).send('Not Found!');
 }
 
