@@ -14,7 +14,7 @@ app.use(cors());
 
 // API routes
 app.get('/location', handleLocation)
-app.get('weather', handleWeather)
+app.get('/weather', handleWeather)
 app.use('*', handleCatchAll);
 
 // Handler function for the GET /location route
