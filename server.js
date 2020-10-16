@@ -8,52 +8,76 @@ const express = require('express');
 const cors = require('cors');
 
 // Application setup
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(cors());
 
-// GET route which accepts a location search query and return lat and lng
-// Returns an object which contains the necessary information for correct client rendering
-app.get('/location', (request, response) =>{
-    let searchQuery = request.query.data;
-    const geoData = require('./data/geo.json');
-    const location = new Location(searchQuery, geoData);
-  
-    response.status(200).send(location);
-})
+// API routes
+app.get('/location', handleLocation)
+app.get('weather', handleWeather)
+app.use('*', handleCatchAll);
 
-// GET route which returns daily weather forecast from the stored JSON
-// Return an array of objects for each day of the response which contains the necessary information for correct client rendering
-app.get('/weather', (response) => {
-    const darkskyData = require('./data/darksky.json');
-    const forecast = [];
-    
-    darkskyData.daily.data.forEach(obj => {
-      let weather = new Weather(obj);
-      forecast.push(weather);
-    })
-  
-    response.status(200).send(forecast);
-})
+// Handler function for the GET /location route
+// Returns an object which contains the necessary information for correct client rendering
+function handleLocation(request, response) {
+    try {
+        const geoData = require('./data/geo.json');
+        const city = request.query.data;
+        const location = new Location(city, geoData);
+      
+        response.status(200).send(location);
+    }
+    catch(error) {
+        handleInternalError(error)
+    }
+}
 
 // A constructor function that converts the search query to a latitude and longitude
-function Location(searchQuery, geoData){
-    this.search_query = searchQuery;
-    this.formatted_query = geoData.results[0].formatted_address;
-    this.latitude = geoData.results[0].geometry.location.lat;
-    this.longitude = geoData.results[0].geometry.location.lng;
+function Location(city, geoData) {
+    this.search_query = city;
+    this.formatted_query = geoData[0].display_name;
+    this.latitude = geoData[0].lat;
+    this.longitude = geoData[0].lon;
+}
+
+// Handler function for the GET /weather route
+// Return an array of objects for each day of the response which contains the necessary information for correct client rendering
+function handleWeather(response) {
+    try {
+        const darkskyData = require('./data/darksky.json');
+        const forecast = [];
+        
+        darkskyData.forEach(obj => {
+          let weather = new Weather(obj);
+          forecast.push(weather);
+        })
+      
+        response.status(200).send(forecast);
+    }
+    catch(error) {
+        handleInternalError(error);
+    }
 }
 
 // A constructor function that converts an object to a weather object
-function Weather(obj){
-    this.forecast = obj.summary;
+function Weather(obj) {
+    this.forecast = obj.weather.description;
     this.time = this.formattedDate(obj.time);
 }
 
 // A prototype that converts time into a date
 Weather.prototype.formattedDate = function(time) {
-    let date = new Date(time*1000);
+    let date = new Date(time);
     return date.toDateString();
+}
+
+function handleInternalError(error) {
+    console.log('ERROR', error);
+    response.status(500).send('So sorry, something went wrong.');
+}
+
+function handleCatchAll(response) {
+    response.status(404).send('Not Found!');
 }
 
 // Make sure the server is listening for requests
