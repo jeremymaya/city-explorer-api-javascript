@@ -60,7 +60,7 @@ Start the application in development mode with the following command:
 node server.js
 ```
 
-Access the endpoint running at <http://localhost:3000>
+Access the endpoint running at <http://localhost:3000>.
 
 ### Production Mode
 
@@ -75,6 +75,8 @@ Click `Deploy Branch`.
 Access the endpoint running at <https://APP_NAME.herokuapp.com>.
 
 The endpoint deployed from this project is accessible at <https://city-explorer-api-javascript.herokuapp.com>
+
+The above endpoint can be rendered at [City Explorer app's welcome page](https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end/).
 
 ---
 
