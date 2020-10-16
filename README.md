@@ -16,8 +16,6 @@ For this lab assignment, we will convert a location entered by the user into a l
 
 This application uses the following technologies:
 
-* HTML
-* CSS
 * JavaScript
 * Express
 * Node.js
@@ -31,7 +29,7 @@ This application uses the following technologies:
 Clone this repository to your local machine:
 
 ```bash
-https://github.com/jeremymaya/code-301-lab-06.gitcut-string.git
+https://github.com/jeremymaya/code-301-lab-06.git
 ```
 
 Install the dependencies:
