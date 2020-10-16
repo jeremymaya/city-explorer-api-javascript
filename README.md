@@ -2,7 +2,9 @@
 
 Author: Kyungrae Kim
 
-Endpoint: <https://city-explorer-api-javascript.herokuapp.com>
+City Explorer: <https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end>
+
+Backend Endpoint: <https://city-explorer-api-javascript.herokuapp.com>
 
 ---
 
@@ -95,6 +97,30 @@ Click `Deploy Branch`.
 Access the endpoint running at <https://APP_NAME.herokuapp.com>.
 
 The endpoint deployed from this project is accessible at <https://city-explorer-api-javascript.herokuapp.com>
+
+Test the functionality of the `/location` endpoint running at `city-explorer-api-javascript.herokuapp.com` with the following command:
+
+```bash
+curl -X GET https://city-explorer-api-javascript.herokuapp.com/location --data "city=lynwood"
+```
+
+The expected output of the above command is:
+
+```bash
+{"formatted_query":"Lynnwood, Snohomish County, Washington, USA","latitude":"47.8278656","longitude":"-122.3053932"}
+```
+
+Test the functionality of the `/weather` endpoint running at `city-explorer-api-javascript.herokuapp.com` with the following command:
+
+```bash
+curl -X GET https://city-explorer-api-javascript.herokuapp.com/weather --data "formatted_query=Lynnwood%2C%20Snohomish%20County%2C%20Washington%2C%20USA&latitude=47.8278656&longitude=-122.3053932&page=1"
+```
+
+The expected output of the above command is:
+
+```bash
+[{"forecast":"Few clouds","time":"Sun Apr 12 2020"},{"forecast":"Few clouds","time":"Mon Apr 13 2020"},{"forecast":"Scattered clouds","time":"Tue Apr 14 2020"},{"forecast":"Few clouds","time":"Wed Apr 15 2020"},{"forecast":"Broken clouds","time":"Thu Apr 16 2020"}]
+```
 
 The above endpoint can be rendered at [City Explorer app's welcome page](https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end/).
 
