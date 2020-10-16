@@ -62,12 +62,12 @@ function handleWeather(request, response) {
 // A constructor function that converts an object to a weather object
 function Weather(obj) {
     this.forecast = obj.weather.description;
-    this.time = this.formattedDate(obj.time);
+    this.time = this.formattedDate(obj.valid_date);
 }
 
 // A prototype that converts time into a date
-Weather.prototype.formattedDate = function(time) {
-    let date = new Date(time);
+Weather.prototype.formattedDate = function(valid_date) {
+    let date = new Date(valid_date);
     return date.toDateString();
 }
 
