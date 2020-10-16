@@ -13,10 +13,10 @@ const app = express();
 app.use(cors());
 
 // API routes
-app.get('/location', handleLocation)
-app.get('/weather', handleWeather)
+app.get('/location', handleLocation);
+app.get('/weather', handleWeather);
 
-app.use('*', handleCatchAll);
+app.use('*', catchAll);
 
 // Handler function for the GET /location route
 // Returns an object which contains the necessary information for correct client rendering
@@ -43,12 +43,12 @@ function Location(city, geoData) {
 
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
-function handleWeather(response) {
+function handleWeather(request, response) {
     try {
-        const darkskyData = require('./data/weather.json');
+        const weatherData = require('./data/weather.json');
         const forecast = [];
         
-        darkskyData.forEach(obj => {
+        weatherData.data.forEach(obj => {
           let weather = new Weather(obj);
           forecast.push(weather);
         })
@@ -74,10 +74,10 @@ Weather.prototype.formattedDate = function(valid_date) {
 
 function handleInternalError(error) {
     console.log('ERROR', error);
-    response.status(500).send('So sorry, something went wrong.');
+    response.status(505).send('Uh oh, something went wrong!');
 }
 
-function handleCatchAll(response) {
+function catchAll(request, response) {
     response.status(404).send('Not Found!');
 }
 
