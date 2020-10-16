@@ -74,11 +74,11 @@ Weather.prototype.formattedDate = function(valid_date) {
 
 function handleInternalError(error) {
     console.log('ERROR', error);
-    response.status(505).send('Uh oh, something went wrong!');
+    response.status(500).send('Sorry, something went wrong');
 }
 
 function catchAll(request, response) {
-    response.status(404).send('Not Found!');
+    response.status(404).send('404 Not Found D:');
 }
 
 // Make sure the server is listening for requests
