@@ -1,18 +1,21 @@
 # code-301-lab-06
 
-**Author**: Biniam Tesfamariam and Kyungrae Kim
-**Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
+Author: Kyungrae Kim
+
+Endpoint: <https://city-explorer-api-javascript.herokuapp.com>
+
+---
 
 ## Overview
-<!-- Provide a high level overview of what this application is and why you are building it, beyond the fact that it's an assignment for this class. (i.e. What's your problem domain?) -->
+
 For this lab assignment, we will convert a location entered by the user into a latitude and longitude, then use those values to request weather information for that location.
 
-## Getting Started
-<!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
+---
 
 ## Architecture
-<!-- Provide a detailed description of the application design. What technologies (languages, libraries, etc) you're using, and any other relevant design information. -->
+
 This application uses the following technologies:
+
 * HTML
 * CSS
 * JavaScript
@@ -21,22 +24,88 @@ This application uses the following technologies:
 * Dotenv
 * npm
 
-## Change Log
-<!-- Use this area to document the iterative changes made to your application as each feature is successfully implemented. Use time stamps. Here's an examples:
+---
 
-01-01-2001 4:59pm - Application now has a fully-functional express server, with a GET route for the location resource.
+## Getting Started
 
-## Credits and Collaborations
-<!-- Give credit (and a link) to other people or resources that helped you build this application. -->
-01-01-2001 9:15am - Project initiated
+Clone this repository to your local machine:
 
-## Time Estimate
-Number and name of feature: Code 301 Lab 06 -  Node, npm, and Express
+```bash
+https://github.com/jeremymaya/code-301-lab-06.gitcut-string.git
+```
 
-Estimate of time needed to complete: 3.5 hours
+Install the dependencies:
 
-Start time: 9:00am
+```bash
+npm i
+```
 
-Finish time: 1:45pm
+### Development Mode
 
-Actual time needed to complete: 3.75 hours
+Create a `.env` file:
+
+```bash
+touch .env
+```
+
+Populate the following environmental variables in the `.env` file:
+
+```text
+PORT=XXXX
+```
+
+Start the application in development mode with the following command:
+
+```bash
+node server.js
+```
+
+Test the functionality of the `/location` endpoint running at `localhost:3000` with the following command:
+
+```bash
+curl -X GET http://localhost:3000/location --data "city=lynwood"
+```
+
+The expected output of the above command is:
+
+```bash
+{"formatted_query":"Lynnwood, Snohomish County, Washington, USA","latitude":"47.8278656","longitude":"-122.3053932"}
+```
+
+Test the functionality of the `/weather` endpoint running at `localhost:3000` with the following command:
+
+```bash
+curl -X GET http://localhost:3000/weather --data "formatted_query=Lynnwood%2C%20Snohomish%20County%2C%20Washington%2C%20USA&latitude=47.8278656&longitude=-122.3053932&page=1"
+```
+
+The expected output of the above command is:
+
+```bash
+[{"forecast":"Few clouds","time":"Sun Apr 12 2020"},{"forecast":"Few clouds","time":"Mon Apr 13 2020"},{"forecast":"Scattered clouds","time":"Tue Apr 14 2020"},{"forecast":"Few clouds","time":"Wed Apr 15 2020"},{"forecast":"Broken clouds","time":"Thu Apr 16 2020"}]
+```
+
+### Production Mode
+
+Create a new Heroku app by clicking `New`.
+
+After the app has been created, go to the `Deploy` tab and select GitHub as `Deployment method`.
+
+Connect the correct repository from GitHub and choose the right branch to deploy.
+
+Click `Deploy Branch`.
+
+Access the endpoint running at <https://APP_NAME.herokuapp.com>.
+
+The endpoint deployed from this project is accessible at <https://city-explorer-api-javascript.herokuapp.com>
+
+The above endpoint can be rendered at [City Explorer app's welcome page](https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end/).
+
+---
+
+## Credits
+
+* [GitHub - Code Fellows 301 Demo](https://github.com/codefellows/seattle-301n19/blob/master/class-06/demo/server/server.js)
+* [Medium - Package.json Vs Package-lock.json Vs Npm-shrinkwrap.json](https://medium.com/@hossam.hilal0/package-json-vs-package-lock-json-vs-npm-shrinkwrap-json-33fcddc1521a)
+* [Express - Installing](https://expressjs.com/en/starter/installing.html)
+* [Express - Hello world example](https://expressjs.com/en/starter/hello-world.html)
+* [keycdn - Popular curl Examples](https://www.keycdn.com/support/popular-curl-examples)
