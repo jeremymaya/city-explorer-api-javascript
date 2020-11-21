@@ -67,6 +67,7 @@ function getWeather(request, response) {
         .get(url)
         .query(parameters)
         .then(data => {
+            console.log(data.text.data);
             const weatherData = data.text.data;
             const forecast = weatherData.map(weather => new Weather(weather)); 
             response.status(200).send(forecast);
