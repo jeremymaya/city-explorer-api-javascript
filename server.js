@@ -89,7 +89,7 @@ Weather.prototype.formattedDate = function(valid_date) {
     return date.toDateString();
 }
 
-function getIndex() {
+function getIndex(request, response) {
     response.status(200).send('Pair this backend with: https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end');
 }
 

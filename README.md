@@ -129,9 +129,11 @@ The above endpoint can be rendered at [City Explorer app's welcome page](https:/
 ## Credits
 
 * [GitHub - Code Fellows 301 Demo](https://github.com/codefellows/seattle-301n19/blob/master/class-06/demo/server/server.js)
+* [Trello - City Explorer](https://trello.com/b/ZmD87LCC/city-explorer)
 * [Medium - Package.json Vs Package-lock.json Vs Npm-shrinkwrap.json](https://medium.com/@hossam.hilal0/package-json-vs-package-lock-json-vs-npm-shrinkwrap-json-33fcddc1521a)
 * [Express - Installing](https://expressjs.com/en/starter/installing.html)
 * [Express - Hello world example](https://expressjs.com/en/starter/hello-world.html)
 * [keycdn - Popular curl Examples](https://www.keycdn.com/support/popular-curl-examples)
 * [Superagent Documentation](https://visionmedia.github.io/superagent/#request-basics)
 * [LocationIQ API Documentation](https://locationiq.com/docs)
+* [Weatherbit.io API Documentation](https://www.weatherbit.io/api)
