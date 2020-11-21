@@ -133,3 +133,4 @@ The above endpoint can be rendered at [City Explorer app's welcome page](https:/
 * [Express - Installing](https://expressjs.com/en/starter/installing.html)
 * [Express - Hello world example](https://expressjs.com/en/starter/hello-world.html)
 * [keycdn - Popular curl Examples](https://www.keycdn.com/support/popular-curl-examples)
+* [LocationIQ Documentation](https://locationiq.com/docs)
