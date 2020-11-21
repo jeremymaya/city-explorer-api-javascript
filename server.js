@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 
 // API routes
+app.get('/', getIndex);
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
 
@@ -67,8 +68,7 @@ function getWeather(request, response) {
         .get(url)
         .query(parameters)
         .then(data => {
-            console.log(data.text);
-            const weatherData = data.text;
+            const weatherData = data.body.data;
             const forecast = weatherData.map(weather => new Weather(weather)); 
             response.status(200).send(forecast);
         })
@@ -87,6 +87,10 @@ function Weather(obj) {
 Weather.prototype.formattedDate = function(valid_date) {
     let date = new Date(valid_date);
     return date.toDateString();
+}
+
+function getIndex() {
+    response.status(200).send('Pair this backend with: https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end');
 }
 
 function handleInternalError(error) {
