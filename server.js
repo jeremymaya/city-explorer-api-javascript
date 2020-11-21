@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // Application dependencies
 const express = require('express');
+const superagent = require('superagent');
 const cors = require('cors');
 
 // Application setup
@@ -13,51 +14,67 @@ const app = express();
 app.use(cors());
 
 // API routes
-app.get('/location', handleLocation);
-app.get('/weather', handleWeather);
+app.get('/', getIndex);
+app.get('/location', getLocation);
+app.get('/weather', getWeather);
 
 app.use('*', catchAll);
 
 // Handler function for the GET /location route
 // Returns an object which contains the necessary information for correct client rendering
-function handleLocation(request, response) {
-    try {
-        const geoData = require('./data/geo.json');
-        const city = request.query.data;
-        const location = new Location(city, geoData);
-      
-        response.status(200).send(location);
-    }
-    catch(error) {
-        handleInternalError(error)
-    }
+function getLocation(request, response) {
+    const city = request.query.city;
+    const url = 'https://us1.locationiq.com/v1/search.php';
+    const parameters = {
+        key: process.env.GEOCODE_API_KEY,
+        q: city,
+        format: 'json',
+        limit: 1
+    };
+
+    superagent
+        .get(url)
+        .query(parameters)
+        .then(data => {
+            const geoData = data.body[0];
+            const location = new Location(city, geoData);
+            response.status(200).send(location);
+        })
+        .catch(error => {
+            handleInternalError(error);
+        });
 }
 
 // A constructor function that converts the search query to a latitude and longitude
 function Location(city, geoData) {
     this.search_query = city;
-    this.formatted_query = geoData[0].display_name;
-    this.latitude = geoData[0].lat;
-    this.longitude = geoData[0].lon;
+    this.formatted_query = geoData.display_name;
+    this.latitude = geoData.lat;
+    this.longitude = geoData.lon;
 }
 
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
-function handleWeather(request, response) {
-    try {
-        const weatherData = require('./data/weather.json');
-        const forecast = [];
-        
-        weatherData.data.forEach(obj => {
-          let weather = new Weather(obj);
-          forecast.push(weather);
+function getWeather(request, response) {
+    const city = request.query;
+    const url = 'https://api.weatherbit.io/v2.0/forecast/daily';
+    const parameters = {
+        key: process.env.WEATHER_API_KEY,
+        lat: city.latitude,
+        lon: city.longitude
+    };
+
+    superagent
+        .get(url)
+        .query(parameters)
+        .then(data => {
+            const weatherData = data.body.data;
+            const forecast = weatherData.map(weather => new Weather(weather)); 
+            response.status(200).send(forecast);
         })
-      
-        response.status(200).send(forecast);
-    }
-    catch(error) {
-        handleInternalError(error);
-    }
+        .catch(error => {
+            handleInternalError(error);
+        });
 }
 
 // A constructor function that converts an object to a weather object
@@ -70,6 +87,10 @@ function Weather(obj) {
 Weather.prototype.formattedDate = function(valid_date) {
     let date = new Date(valid_date);
     return date.toDateString();
+}
+
+function getIndex(request, response) {
+    response.status(200).send('Pair this backend with: https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end');
 }
 
 function handleInternalError(error) {
