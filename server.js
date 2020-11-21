@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // Application dependencies
 const express = require('express');
+const superagent = require('superagent');
 const cors = require('cors');
 
 // Application setup
@@ -21,24 +22,35 @@ app.use('*', catchAll);
 // Handler function for the GET /location route
 // Returns an object which contains the necessary information for correct client rendering
 function getLocation(request, response) {
-    try {
-        const geoData = require('./data/geo.json');
-        const city = request.query.data;
-        const location = new Location(city, geoData);
-      
-        response.status(200).send(location);
-    }
-    catch(error) {
-        handleInternalError(error)
-    }
+    const city = request.query.city;
+    const url = 'https://us1.locationiq.com/v1/search.php';
+    const parameters = {
+        key: process.env.GEOCODE_API_KEY,
+        q: city,
+        format: 'json',
+        limit: 1
+    };
+
+    superagent
+        .get(url)
+        .query(parameters)
+        .then(data => {
+            const geoData = data.body[0];
+            console.log(geoData);
+            const location = new Location(city, geoData);
+            response.status(200).send(location);
+        })
+        .catch(error => {
+            handleInternalError(error);
+        });
 }
 
 // A constructor function that converts the search query to a latitude and longitude
 function Location(city, geoData) {
     this.search_query = city;
-    this.formatted_query = geoData[0].display_name;
-    this.latitude = geoData[0].lat;
-    this.longitude = geoData[0].lon;
+    this.formatted_query = geoData.display_name;
+    this.latitude = geoData.lat;
+    this.longitude = geoData.lon;
 }
 
 // Handler function for the GET /weather route
@@ -47,7 +59,7 @@ function getWeather(request, response) {
     try {
         const weatherData = require('./data/weather.json');
         const forecast = weatherData.data.map(weather => new Weather(weather)); 
-             
+
         response.status(200).send(forecast);
     }
     catch(error) {
