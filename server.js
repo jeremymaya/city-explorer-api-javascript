@@ -13,14 +13,14 @@ const app = express();
 app.use(cors());
 
 // API routes
-app.get('/location', handleLocation);
-app.get('/weather', handleWeather);
+app.get('/location', getLocation);
+app.get('/weather', getWeather);
 
 app.use('*', catchAll);
 
 // Handler function for the GET /location route
 // Returns an object which contains the necessary information for correct client rendering
-function handleLocation(request, response) {
+function getLocation(request, response) {
     try {
         const geoData = require('./data/geo.json');
         const city = request.query.data;
@@ -43,16 +43,11 @@ function Location(city, geoData) {
 
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
-function handleWeather(request, response) {
+function getWeather(request, response) {
     try {
         const weatherData = require('./data/weather.json');
-        const forecast = [];
-        
-        weatherData.data.forEach(obj => {
-          let weather = new Weather(obj);
-          forecast.push(weather);
-        })
-      
+        const forecast = weatherData.data.map(weather => new Weather(weather)); 
+             
         response.status(200).send(forecast);
     }
     catch(error) {
