@@ -6,7 +6,16 @@ require('dotenv').config();
 // Application dependencies
 const express = require('express');
 const superagent = require('superagent');
+const pg = require('pg');
 const cors = require('cors');
+
+// Postgres client setup
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
 
 // Application setup
 const PORT = process.env.PORT || 3000;
@@ -24,6 +33,20 @@ app.use('*', catchAll);
 // Returns an object which contains the necessary information for correct client rendering
 function getLocation(request, response) {
     const city = request.query.city;
+    const sql = 'SELECT * FROM locations WHERE search_query=$1';
+
+    client
+        .query(sql, [city])
+        .then(result => {
+            result.rowCount > 0 ? response.status(200).json(result.rows[0]) : searchLocation(request, response);
+        })
+        .catch(error => {
+            handleInternalError(error);
+        });
+}
+
+function searchLocation(request, response) {
+    const city = request.query.city;
     const url = 'https://us1.locationiq.com/v1/search.php';
     const parameters = {
         key: process.env.GEOCODE_API_KEY,
@@ -36,10 +59,23 @@ function getLocation(request, response) {
         .get(url)
         .query(parameters)
         .then(data => {
+            console.log('new location')
             const geoData = data.body[0];
             const location = new Location(city, geoData);
+            saveLocation(location);
             response.status(200).send(location);
         })
+        .catch(error => {
+            handleInternalError(error);
+        });
+}
+
+function saveLocation(location) {
+    const sql = 'INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
+    const value = [location.search_query, location.formatted_query, location.latitude, location.longitude];
+    
+    client
+        .query(sql, value)
         .catch(error => {
             handleInternalError(error);
         });
