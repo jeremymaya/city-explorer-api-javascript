@@ -56,15 +56,34 @@ function Location(city, geoData) {
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
 function getWeather(request, response) {
-    try {
-        const weatherData = require('./data/weather.json');
-        const forecast = weatherData.data.map(weather => new Weather(weather)); 
+    console.log(request.query);
+    // const city = request.query.city;
+    // const url = 'https://api.weatherbit.io/v2.0/forecast/daily';
+    // const parameters = {
+    //     key: process.env.WEATHER_API_KEY,
+    //     lat: city.latitude,
+    //     lon: city.longitude
+    // };
 
-        response.status(200).send(forecast);
-    }
-    catch(error) {
-        handleInternalError(error);
-    }
+    // superagent
+    //     .get(url)
+    //     .query(parameters)
+    //     .then(data => {
+
+    //     })
+    //     .catch(error => {
+    //         handleInternalError(error);
+    //     });
+
+    // try {
+    //     const weatherData = require('./data/weather.json');
+    //     const forecast = weatherData.data.map(weather => new Weather(weather)); 
+
+    //     response.status(200).send(forecast);
+    // }
+    // catch(error) {
+    //     handleInternalError(error);
+    // }
 }
 
 // A constructor function that converts an object to a weather object
