@@ -2,8 +2,6 @@
 
 Author: Kyungrae Kim
 
-City Explorer: <https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end>
-
 Backend Endpoint: <https://city-explorer-api-javascript.herokuapp.com>
 
 ---
