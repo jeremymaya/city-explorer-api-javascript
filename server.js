@@ -58,6 +58,7 @@ function searchLocation(request, response) {
         .then(data => {
             const geoData = data.body[0];
             const location = new Location(city, geoData);
+            console.log(location);
             saveLocation(location);
             response.status(200).send(location);
         })
@@ -66,8 +67,8 @@ function searchLocation(request, response) {
 
 // Saves the new city infromation to the database
 function saveLocation(location) {
-    const sql = 'INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
-    const value = [location.search_query, location.formatted_query, location.latitude, location.longitude];
+    const sql = 'INSERT INTO locations (search_query, formatted_query, lat, lon) VALUES ($1, $2, $3, $4);';
+    const value = [location.search_query, location.formatted_query, location.lat, location.lon];
     
     client
         .query(sql, value)
