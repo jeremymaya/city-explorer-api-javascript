@@ -79,8 +79,8 @@ function saveLocation(location) {
 function Location(city, geoData) {
     this.search_query = city;
     this.formatted_query = geoData.display_name;
-    this.lat = geoData.lat;
-    this.lon = geoData.lon;
+    this.latitude = geoData.lat;
+    this.longitude = geoData.lon;
 }
 
 // Handler function for the GET /weather route
@@ -90,8 +90,8 @@ function getWeather(request, response) {
     const url = 'https://api.weatherbit.io/v2.0/forecast/daily';
     const parameters = {
         key: process.env.WEATHER_API_KEY,
-        lat: city.lat,
-        lon: city.lon
+        lat: city.latitude,
+        lon: city.longitude
     };
 
     superagent
