@@ -10,12 +10,7 @@ const pg = require('pg');
 const cors = require('cors');
 
 // Postgres client setup
-const client = new pg.Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false
-    }
-  });
+const client = new pg.Client(process.env.DATABASE_URL);
 
 // Application setup
 const PORT = process.env.PORT || 3000;
@@ -37,12 +32,8 @@ function getLocation(request, response) {
 
     client
         .query(sql, [city])
-        .then(result => {
-            result.rowCount > 0 ? response.status(200).json(result.rows[0]) : searchLocation(request, response);
-        })
-        .catch(error => {
-            handleInternalError(error);
-        });
+        .then(result => result.rowCount ? response.status(200).json(result.rows[0]) : searchLocation(request, response))
+        .catch(error => handleInternalError(error));
 }
 
 function searchLocation(request, response) {
@@ -59,15 +50,12 @@ function searchLocation(request, response) {
         .get(url)
         .query(parameters)
         .then(data => {
-            console.log('new location')
             const geoData = data.body[0];
             const location = new Location(city, geoData);
             saveLocation(location);
             response.status(200).send(location);
         })
-        .catch(error => {
-            handleInternalError(error);
-        });
+        .catch(error => handleInternalError(error));
 }
 
 function saveLocation(location) {
@@ -76,9 +64,7 @@ function saveLocation(location) {
     
     client
         .query(sql, value)
-        .catch(error => {
-            handleInternalError(error);
-        });
+        .catch(error => handleInternalError(error));
 }
 
 // A constructor function that converts the search query to a latitude and longitude
