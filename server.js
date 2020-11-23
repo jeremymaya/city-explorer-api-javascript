@@ -63,7 +63,7 @@ function searchLocation(request, response) {
             saveLocation(location);
             response.status(200).send(location);
         })
-        .catch(error => handleInternalError(error));
+        .catch(error => handleInternalError(request, response, error));
 }
 
 // Saves the new city infromation to the database
@@ -103,7 +103,7 @@ function getWeather(request, response) {
             const forecast = weatherData.map(weather => new Weather(weather)); 
             response.status(200).send(forecast);
         })
-        .catch(error => handleInternalError(error));
+        .catch(error => handleInternalError(request, response, error));
 }
 
 // A constructor function that converts an object to a weather object
@@ -126,30 +126,27 @@ function getMovies(request, response) {
         query: city,
         page: 1
     };
+    const imageConfig = getTheMovieDBConfiguration(request, response);
 
     superagent
         .get(url)
         .query(parameters)
         .then(data => {
             const movieData = data.body.results;
-            const imageConfig = getTheMovieDBConfiguration();
             const movies = movieData.map(movie => new Movie(movie, imageConfig)); 
             response.status(200).send(movies);
         })
-        .catch(error => handleInternalError(error));
+        .catch(error => handleInternalError(request, response, error));
 }
 
-function getTheMovieDBConfiguration() {
+function getTheMovieDBConfiguration(request, response) {
     const url = 'https://api.themoviedb.org/3/configuration';
-    const parameters = {
-        api_key: process.env.MOVIE_API_KEY
-    };
-
+    
     superagent
         .get(url)
-        .query(parameters)
-        .then(data => data.body.images)
-        .catch(error => handleInternalError(error));
+        .query({ api_key: process.env.MOVIE_API_KEY })
+        .then(data => response.status(200).send(data.body.images))
+        .catch(error => handleInternalError(request, response, error));
 }
 
 // A constructor function that converts an object to a weather object
@@ -169,7 +166,7 @@ function getIndex(request, response) {
 }
 
 // Handler function for internal errors
-function handleInternalError(error) {
+function handleInternalError(request, response, error) {
     console.log('ERROR', error);
     response.status(500).send('Sorry, something went wrong');
 }
