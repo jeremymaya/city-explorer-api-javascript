@@ -26,6 +26,7 @@ app.use(cors());
 app.get('/', getIndex);
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
+app.get('/movies', getMovies);
 app.use('*', catchAll);
 
 // Handler function for the GET /location route
@@ -115,6 +116,51 @@ function Weather(obj) {
 Weather.prototype.formattedDate = function(valid_date) {
     let date = new Date(valid_date);
     return date.toDateString();
+}
+
+function getMovies(request, response) {
+    const city = request.query;
+    const url = 'https://api.themoviedb.org/3/search/movie';
+    const parameters = {
+        api_key: process.env.MOVIE_API_KEY,
+        query: city,
+        page: 1
+    };
+
+    superagent
+        .get(url)
+        .query(parameters)
+        .then(data => {
+            const movieData = data.body.results;
+            const imageConfig = getTheMovieDBConfiguration();
+            const movies = movieData.map(movie => new Movie(movie, imageConfig)); 
+            response.status(200).send(movies);
+        })
+        .catch(error => handleInternalError(error));
+}
+
+function getTheMovieDBConfiguration() {
+    const url = 'https://api.themoviedb.org/3/configuration';
+    const parameters = {
+        api_key: process.env.MOVIE_API_KEY
+    };
+
+    superagent
+        .get(url)
+        .query(parameters)
+        .then(data => data.body.images)
+        .catch(error => handleInternalError(error));
+}
+
+// A constructor function that converts an object to a weather object
+function Movie(obj, imageConfig) {
+    this.title = obj.title;
+    this.overview = obj.overview;
+    this.average_votes = obj.vote_average;
+    this.total_votes = obj.vote_count;
+    this.image_url = obj.poster_path ? `${imageConfig.secure_base_url}${imageConfig.poster_sizes['w500']}${obj.poster_path}` : 'https://via.placeholder.com/500';
+    this.popularity = obj.popularity;
+    this.released_on = obj.release_date;
 }
 
 // Handler function for the GET / route

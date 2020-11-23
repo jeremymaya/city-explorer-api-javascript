@@ -135,3 +135,4 @@ The above endpoint can be rendered at [City Explorer app's welcome page](https:/
 * [Superagent Documentation](https://visionmedia.github.io/superagent/#request-basics)
 * [LocationIQ API Documentation](https://locationiq.com/docs)
 * [Weatherbit.io API Documentation](https://www.weatherbit.io/api)
+* [The Movie Database API Documentation](https://developers.themoviedb.org/3/getting-started/introduction)
