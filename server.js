@@ -119,7 +119,7 @@ Weather.prototype.formattedDate = function(valid_date) {
 }
 
 function getMovies(request, response) {
-    const city = request.query;
+    const city = request.query.search_query;
     const url = 'https://api.themoviedb.org/3/search/movie';
     const parameters = {
         api_key: process.env.MOVIE_API_KEY,
@@ -158,7 +158,7 @@ function Movie(obj, imageConfig) {
     this.overview = obj.overview;
     this.average_votes = obj.vote_average;
     this.total_votes = obj.vote_count;
-    this.image_url = obj.poster_path ? `${imageConfig.secure_base_url}${imageConfig.poster_sizes['w500']}${obj.poster_path}` : 'https://via.placeholder.com/500';
+    this.image_url = obj.poster_path ? `${imageConfig.secure_base_url}${imageConfig.poster_sizes[4]}${obj.poster_path}` : 'https://via.placeholder.com/500';
     this.popularity = obj.popularity;
     this.released_on = obj.release_date;
 }
