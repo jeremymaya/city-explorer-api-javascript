@@ -123,7 +123,7 @@ function getMovies(request, response) {
     const url = 'https://api.themoviedb.org/3/search/movie';
     const parameters = {
         api_key: process.env.MOVIE_API_KEY,
-        query: city,
+        query: 'seattle',
         page: 1
     };
 
@@ -132,19 +132,19 @@ function getMovies(request, response) {
         .query(parameters)
         .then(data => {
             const movieData = data.body.results;
-            const movies = movieData.map(movie => new Movie(movie, imageConfig)); 
+            const movies = movieData.map(movie => new Movie(movie)); 
             response.status(200).send(movies);
         })
         .catch(error => handleInternalError(request, response, error));
 }
 
 // A constructor function that converts an object to a weather object
-function Movie(obj, imageConfig) {
+function Movie(obj) {
     this.title = obj.title;
     this.overview = obj.overview;
     this.average_votes = obj.vote_average;
     this.total_votes = obj.vote_count;
-    this.image_url = obj.poster_path ? `https://image.tmdb.org/t/p/w500/${obj.poster_path}` : 'https://via.placeholder.com/500';
+    this.image_url = obj.poster_path ? `https://image.tmdb.org/t/p/w500${obj.poster_path}` : 'https://via.placeholder.com/500';
     this.popularity = obj.popularity;
     this.released_on = obj.release_date;
 }
