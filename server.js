@@ -126,7 +126,6 @@ function getMovies(request, response) {
         query: city,
         page: 1
     };
-    const imageConfig = getTheMovieDBConfiguration(request, response);
 
     superagent
         .get(url)
@@ -139,23 +138,13 @@ function getMovies(request, response) {
         .catch(error => handleInternalError(request, response, error));
 }
 
-function getTheMovieDBConfiguration(request, response) {
-    const url = 'https://api.themoviedb.org/3/configuration';
-    
-    superagent
-        .get(url)
-        .query({ api_key: process.env.MOVIE_API_KEY })
-        .then(data => response.status(200).send(data.body.images))
-        .catch(error => handleInternalError(request, response, error));
-}
-
 // A constructor function that converts an object to a weather object
 function Movie(obj, imageConfig) {
     this.title = obj.title;
     this.overview = obj.overview;
     this.average_votes = obj.vote_average;
     this.total_votes = obj.vote_count;
-    this.image_url = obj.poster_path ? `${imageConfig.secure_base_url}${imageConfig.poster_sizes[4]}${obj.poster_path}` : 'https://via.placeholder.com/500';
+    this.image_url = obj.poster_path ? `https://image.tmdb.org/t/p/w500/${obj.poster_path}` : 'https://via.placeholder.com/500';
     this.popularity = obj.popularity;
     this.released_on = obj.release_date;
 }
