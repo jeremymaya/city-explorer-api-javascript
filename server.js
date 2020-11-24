@@ -39,28 +39,24 @@ function getLocation(request, response) {
     client
         .query(sql, [city])
         .then(result => result.rowCount ? response.status(200).json(result.rows[0]) : searchLocation(request, response))
-        .catch(error => handleInternalError(error));
+        .catch(error => handleInternalError(request, response, error));
 }
 
 // Search for a city not in the database
 // Returns an object containing city information from LocationIQ API
 function searchLocation(request, response) {
-    const city = request.query.city;
-    const url = 'https://us1.locationiq.com/v1/search.php';
     const parameters = {
         key: process.env.GEOCODE_API_KEY,
-        q: city,
+        q: request.query.city,
         format: 'json',
         limit: 1
     };
 
     superagent
-        .get(url)
+        .get('https://us1.locationiq.com/v1/search.php')
         .query(parameters)
         .then(data => {
-            const geoData = data.body[0];
-            const location = new Location(city, geoData);
-            console.log(location);
+            const location = new Location(city, data.body[0]);
             saveLocation(location);
             response.status(200).send(location);
         })
@@ -88,16 +84,14 @@ function Location(city, geoData) {
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
 function getWeather(request, response) {
-    const city = request.query;
-    const url = 'https://api.weatherbit.io/v2.0/forecast/daily';
     const parameters = {
         key: process.env.WEATHER_API_KEY,
-        lat: city.latitude,
-        lon: city.longitude
+        lat: request.query.latitude,
+        lon: request.query.longitude
     };
 
     superagent
-        .get(url)
+        .get('https://api.weatherbit.io/v2.0/forecast/daily')
         .query(parameters)
         .then(data => {
             const weatherData = data.body.data;
@@ -120,20 +114,17 @@ Weather.prototype.formattedDate = function(valid_date) {
 }
 
 function getMovies(request, response) {
-    const city = request.query;
-    const url = 'https://api.themoviedb.org/3/search/movie';
     const parameters = {
         api_key: process.env.MOVIE_API_KEY,
-        query: city.search_query,
+        query: request.query.search_query,
         page: 1
     };
 
     superagent
-        .get(url)
+        .get('https://api.themoviedb.org/3/search/movie')
         .query(parameters)
         .then(data => {
-            const movieData = data.body.results;
-            const movies = movieData.map(movie => new Movie(movie)); 
+            const movies = data.body.results.map(movie => new Movie(movie)); 
             response.status(200).send(movies);
         })
         .catch(error => handleInternalError(request, response, error));
@@ -151,21 +142,24 @@ function Movie(obj) {
 }
 
 function getRestaurants(request, response) {
-    const city = request.query;
-    const url = 'https://api.yelp.com/v3/businesses/search';
+    const paginate = 5;
+    const page = request.query.page || 1;
+    const start = ((page - 1) * paginate + 1);
+
     const parameters = {
         term: 'restaurants',
-        latitude: city.latitude,
-        longitude: city.longitude
+        latitude: request.query.latitude,
+        longitude: request.query.longitude,
+        limit: 5,
+        offset: start
     };
 
     superagent
-        .get(url)
+        .get('https://api.yelp.com/v3/businesses/search')
         .auth(process.env.YELP_API_KEY, { type: 'bearer' })
         .query(parameters)
         .then(data => {
-            const restaurantData = data.body.businesses;
-            const restaurants = restaurantData.map(restaurant => new Restaurant(restaurant)); 
+            const restaurants = data.body.businesses.map(restaurant => new Restaurant(restaurant)); 
             response.status(200).send(restaurants);
         })
         .catch(error => handleInternalError(request, response, error));
