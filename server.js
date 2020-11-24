@@ -27,6 +27,7 @@ app.get('/', getIndex);
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
 app.get('/movies', getMovies);
+app.get('/yelp', getRestaurants)
 app.use('*', catchAll);
 
 // Handler function for the GET /location route
@@ -119,11 +120,11 @@ Weather.prototype.formattedDate = function(valid_date) {
 }
 
 function getMovies(request, response) {
-    const city = request.query.search_query;
+    const city = request.query;
     const url = 'https://api.themoviedb.org/3/search/movie';
     const parameters = {
         api_key: process.env.MOVIE_API_KEY,
-        query: 'seattle',
+        query: city.search_query,
         page: 1
     };
 
@@ -144,9 +145,38 @@ function Movie(obj) {
     this.overview = obj.overview;
     this.average_votes = obj.vote_average;
     this.total_votes = obj.vote_count;
-    this.image_url = obj.poster_path ? `https://image.tmdb.org/t/p/w500${obj.poster_path}` : 'https://via.placeholder.com/500';
+    this.image_url = obj.poster_path ? `https://image.tmdb.org/t/p/w500${obj.poster_path}` : 'https://via.placeholder.com/500x750';
     this.popularity = obj.popularity;
     this.released_on = obj.release_date;
+}
+
+function getRestaurants(request, response) {
+    const city = request.query;
+    const url = 'https://api.yelp.com/v3/businesses/search';
+    const parameters = {
+        term: 'restaurants',
+        latitude: city.latitude,
+        longitude: city.longitude
+    };
+
+    superagent
+        .get(url)
+        .auth(process.env.YELP_API_KEY, { type: 'bearer' })
+        .query(parameters)
+        .then(data => {
+            const restaurantData = data.body.businesses;
+            const restaurants = restaurantData.map(restaurant => new Restaurant(restaurant)); 
+            response.status(200).send(restaurants);
+        })
+        .catch(error => handleInternalError(request, response, error));
+}
+
+function Restaurant(obj) {
+    this.name = obj.name;
+    this.image_url = obj.image_url;
+    this.price = obj.price;
+    this.rating = obj.rating;
+    this.url = obj.url;
 }
 
 // Handler function for the GET / route
