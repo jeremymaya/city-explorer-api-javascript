@@ -8,6 +8,7 @@ const express = require('express');
 const superagent = require('superagent');
 const pg = require('pg');
 const cors = require('cors');
+const { on } = require('superagent');
 
 // Postgres client setup
 const client = new pg.Client({
@@ -26,6 +27,7 @@ app.use(cors());
 app.get('/', getIndex);
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
+app.get('/trails', getTrails)
 app.get('/movies', getMovies);
 app.get('/yelp', getRestaurants)
 app.use('*', catchAll);
@@ -111,6 +113,36 @@ function Weather(obj) {
 Weather.prototype.formattedDate = function(valid_date) {
     let date = new Date(valid_date);
     return date.toDateString();
+}
+
+function getTrails(request, response) {
+    const parameters = {
+        key: process.env.TRAIL_API_KEY,
+        lat: request.query.latitude,
+        lon: request.query.longitude
+    };
+
+    superagent
+        .get('https://www.hikingproject.com/data/get-trails')
+        .query(parameters)
+        .then(data => {
+            const trails = data.body.trails.map(trail => new Trail(trail)); 
+            response.status(200).send(trails);
+        })
+        .catch(error => handleInternalError(request, response, error));
+}
+
+function Trail(obj) {
+    this.name = obj.name;
+    this.location = obj.location;
+    this.length = obj.length;
+    this.stars = obj.stars;
+    this.star_votes = obj.starVotes;
+    this.summary = obj.summary;
+    this.trail_url = obj.trail_url;
+    this.conditions = obj.conditionDetails;
+    this.condition_date = obj.conditionDate.split(" ")[0];
+    this.condition_time = obj.conditionDate.split(" ")[1];
 }
 
 function getMovies(request, response) {

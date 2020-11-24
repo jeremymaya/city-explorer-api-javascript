@@ -135,5 +135,6 @@ The above endpoint can be rendered at [City Explorer app's welcome page](https:/
 * [Superagent Documentation](https://visionmedia.github.io/superagent/#request-basics)
 * [LocationIQ API Documentation](https://locationiq.com/docs)
 * [Weatherbit.io API Documentation](https://www.weatherbit.io/api)
+* [Hiking Project API Documentation](https://www.hikingproject.com/data)
 * [The Movie Database API Documentation](https://developers.themoviedb.org/3/getting-started/introduction)
 * [Medium@kirtikau - How to add Swagger UI to existing Node js and Express.js project](https://medium.com/@kirtikau/how-to-add-swagger-ui-to-existing-node-js-and-express-js-project-2c8bad9364ce)
