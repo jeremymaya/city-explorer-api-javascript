@@ -17,10 +17,20 @@ For this lab assignment, we will convert a location entered by the user into a l
 This application uses the following technologies:
 
 * JavaScript
-* Express
 * Node.js
 * Dotenv
+* Express
+* Postgres
 * npm
+
+---
+
+## APIs
+
+* [LocationIQ](https://locationiq.com)
+* [Weatherbit.io](https://www.weatherbit.io)
+* [Hiking Project](https://www.hikingproject.com)
+* [The Movie Database](https://developers.themoviedb.org)
 
 ---
 
@@ -32,10 +42,10 @@ Clone this repository to your local machine:
 https://github.com/jeremymaya/code-301-lab-06.git
 ```
 
-Install the dependencies:
+Navigate to the location where you cloned the repository and install the dependencies:
 
 ```bash
-npm i
+npm install
 ```
 
 ### Development Mode
@@ -46,47 +56,47 @@ Create a `.env` file:
 touch .env
 ```
 
-Populate the following environmental variables in the `.env` file:
+Obtain API keys from the above [APIs](##%20APIs) websites and populate the following environmental variables in the `.env` file:
 
 ```text
 PORT=XXXX
+GEOCODE_API_KEY=API_KEY
+WEATHER_API_KEY=API_KEY
+TRAIL_API_KEY=API_KEY
+MOVIE_API_KEY=API_KEY
+YELP_API_KEY=API_KEY
+DATABASE_URL=CONNECTION_STRING
+```
+
+Navigate to the [data](/data) folder and enter the following command to run the SQL script (below step uses Heroku Postgres):
+
+```bash
+heroku pg:psql -a APP_NAME < SQL_SCRIPT_NAME
 ```
 
 Start the application in development mode with the following command:
 
 ```bash
-node server.js
-```
-
-Test the functionality of the `/location` endpoint running at `localhost:3000` with the following command:
-
-```bash
-curl -X GET http://localhost:3000/location --data "city=lynwood"
-```
-
-The expected output of the above command is:
-
-```bash
-{"formatted_query":"Lynnwood, Snohomish County, Washington, USA","latitude":"47.8278656","longitude":"-122.3053932"}
-```
-
-Test the functionality of the `/weather` endpoint running at `localhost:3000` with the following command:
-
-```bash
-curl -X GET http://localhost:3000/weather --data "formatted_query=Lynnwood%2C%20Snohomish%20County%2C%20Washington%2C%20USA&latitude=47.8278656&longitude=-122.3053932&page=1"
-```
-
-The expected output of the above command is:
-
-```bash
-[{"forecast":"Few clouds","time":"Sun Apr 12 2020"},{"forecast":"Few clouds","time":"Mon Apr 13 2020"},{"forecast":"Scattered clouds","time":"Tue Apr 14 2020"},{"forecast":"Few clouds","time":"Wed Apr 15 2020"},{"forecast":"Broken clouds","time":"Thu Apr 16 2020"}]
+npm start
 ```
 
 ### Production Mode
 
 Create a new Heroku app by clicking `New`.
 
-After the app has been created, go to the `Deploy` tab and select GitHub as `Deployment method`.
+After the app has been created, click `Resources` tab and add `Heroku Postgres`.
+
+Click `Settings` tab and then click `Reveal Config Var` to add the following environmental variables:
+
+```text
+GEOCODE_API_KEY=API_KEY
+WEATHER_API_KEY=API_KEY
+TRAIL_API_KEY=API_KEY
+MOVIE_API_KEY=API_KEY
+YELP_API_KEY=API_KEY
+```
+
+Click `Deploy` tab and select GitHub as `Deployment method`.
 
 Connect the correct repository from GitHub and choose the right branch to deploy.
 
@@ -96,31 +106,146 @@ Access the endpoint running at <https://APP_NAME.herokuapp.com>.
 
 The endpoint deployed from this project is accessible at <https://city-explorer-api-javascript.herokuapp.com>
 
-Test the functionality of the `/location` endpoint running at `city-explorer-api-javascript.herokuapp.com` with the following command:
-
-```bash
-curl -X GET https://city-explorer-api-javascript.herokuapp.com/location --data "city=lynwood"
-```
-
-The expected output of the above command is:
-
-```bash
-{"formatted_query":"Lynnwood, Snohomish County, Washington, USA","latitude":"47.8278656","longitude":"-122.3053932"}
-```
-
-Test the functionality of the `/weather` endpoint running at `city-explorer-api-javascript.herokuapp.com` with the following command:
-
-```bash
-curl -X GET https://city-explorer-api-javascript.herokuapp.com/weather --data "formatted_query=Lynnwood%2C%20Snohomish%20County%2C%20Washington%2C%20USA&latitude=47.8278656&longitude=-122.3053932&page=1"
-```
-
-The expected output of the above command is:
-
-```bash
-[{"forecast":"Few clouds","time":"Sun Apr 12 2020"},{"forecast":"Few clouds","time":"Mon Apr 13 2020"},{"forecast":"Scattered clouds","time":"Tue Apr 14 2020"},{"forecast":"Few clouds","time":"Wed Apr 15 2020"},{"forecast":"Broken clouds","time":"Thu Apr 16 2020"}]
-```
-
 The above endpoint can be rendered at [City Explorer app's welcome page](https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end/).
+
+---
+
+## Endpoints
+
+### Location
+
+| Method | EndPoint | Description |
+|:-|:-|:-|
+| GET | `/location` | |
+
+Test the functionality of the `/location` endpoint running at `localhost:3000` with the following command:
+
+```bash
+curl -X GET 'http://localhost:3000/location?city=seattle'
+```
+
+```json
+Sample Response of GET /location
+
+{
+    "id":1, (if retreived from the database)
+    "search_query":"seattle",
+    "formatted_query":"Seattle, WA, USA",
+    "latitude":47.6062095,
+    "longitude":-122.3320708
+}
+```
+
+### Weather
+
+| Method | EndPoint | Description |
+|:-|:-|:-|
+| GET | `/weather` | |
+
+Test the functionality of the `/weather` endpoint running at `localhost:3000` with the following command:
+
+```bash
+curl -X GET 'http://localhost:3000/weather?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+```
+
+```json
+Sample Response of GET /weather
+
+[
+    {
+        "forecast":"Light rain",
+        "time":"Mon Nov 23 2020"
+    },
+]
+```
+
+### Trails
+
+| Method | EndPoint | Description |
+|:-|:-|:-|
+| GET | `/trails` | |
+
+Test the functionality of the `/trails` endpoint running at `localhost:3000` with the following command:
+
+```bash
+curl -X GET 'http://localhost:3000/trails?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+```
+
+```json
+Sample Response of GET /trails
+
+[
+    {
+        "name":"Poo Poo Point via Chirico Trail",
+        "location":"Issaquah, Washington",
+        "length":3.9,
+        "stars":4.3,
+        "star_votes":68,
+        "summary":"A great place for a picnic and watching paragliders!",
+        "conditions":"Mostly Dry",
+        "condition_date":"2020-10-16",
+        "condition_time":"15:24:28"
+    },
+]
+```
+
+### Movies
+
+| Method | EndPoint | Description |
+|:-|:-|:-|
+| GET | `/movies` | |
+
+Test the functionality of the `/movies` endpoint running at `localhost:3000` with the following command:
+
+```bash
+curl -X GET 'http://localhost:3000/movies?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+```
+
+```json
+Sample Response of GET /movies
+
+[
+    {
+        "title":"Battle in Seattle",
+        "overview":"Thousands of activists arrive in Seattle, Washington in masses to protest the WTO Ministerial Conference of 1999 (World Trade Organization). Although it began as a peaceful protest with a goal of stopping the WTO talks, it escalated into a full-scale riot and eventually, a State of Emergency that pitted protesters against the Seattle Police Department and the National Guard.",
+        "average_votes":6.3,
+        "total_votes":150,
+        "image_url":"https://image.tmdb.org/t/p/w500/aLstoTtWQHEilt9HWdSOiMZfDr7.jpg",
+        "popularity":11.135,
+        "released_on":"2007-09-07"
+    },
+]
+```
+
+### Yelp
+
+| Method | EndPoint | Description |
+|:-|:-|:-|
+| GET | `/yelp` | |
+
+Test the functionality of the `/yelp` endpoint running at `localhost:3000` with the following command:
+
+```bash
+curl -X GET 'http://localhost:3000/yelp?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+```
+
+```bash
+curl -X GET 'https://city-explorer-api-javascript.herokuapp.com/yelp?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+```
+
+```json
+Sample Response of GET /yelp
+
+[
+    {
+        "name":"The Pink Door",
+        "image_url":"https://s3-media1.fl.yelpcdn.com/bphoto/gsBE8LPk4XJfXuo0F-zWeQ/o.jpg",
+        "price":"$$",
+        "rating":4.5,
+        "url":"https://www.yelp.com/biz/the-pink-door-seattle-4?adjust_creative=WXXm1izyYGtXnWezzpxc_g&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=WXXm1izyYGtXnWezzpxc_g"
+    },
+]
+```
 
 ---
 
@@ -135,4 +260,6 @@ The above endpoint can be rendered at [City Explorer app's welcome page](https:/
 * [Superagent Documentation](https://visionmedia.github.io/superagent/#request-basics)
 * [LocationIQ API Documentation](https://locationiq.com/docs)
 * [Weatherbit.io API Documentation](https://www.weatherbit.io/api)
+* [Hiking Project API Documentation](https://www.hikingproject.com/data)
 * [The Movie Database API Documentation](https://developers.themoviedb.org/3/getting-started/introduction)
+* [Medium@kirtikau - How to add Swagger UI to existing Node js and Express.js project](https://medium.com/@kirtikau/how-to-add-swagger-ui-to-existing-node-js-and-express-js-project-2c8bad9364ce)

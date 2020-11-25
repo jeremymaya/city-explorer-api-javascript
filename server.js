@@ -3,13 +3,13 @@
 // Load Environment Variables from the .env file
 require('dotenv').config();
 
-// Dependencies
+// Application Dependencies
 const express = require('express');
 const superagent = require('superagent');
 const pg = require('pg');
 const cors = require('cors');
 
-// Postgres client setup
+// Postgres Setup
 const client = new pg.Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -17,16 +17,18 @@ const client = new pg.Client({
     }
 });
 
-// Application setup
+// Application Setup
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(cors());
 
-// API routes
+// Routes
 app.get('/', getIndex);
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
+app.get('/trails', getTrails)
 app.get('/movies', getMovies);
+app.get('/yelp', getRestaurants)
 app.use('*', catchAll);
 
 // Handler function for the GET /location route
@@ -37,15 +39,13 @@ function getLocation(request, response) {
 
     client
         .query(sql, [city])
-        .then(result => result.rowCount ? response.status(200).json(result.rows[0]) : searchLocation(request, response))
-        .catch(error => handleInternalError(error));
+        .then(result => result.rowCount ? response.status(200).json(result.rows[0]) : searchLocation(response, city))
+        .catch(error => handleInternalError(response, error));
 }
 
 // Search for a city not in the database
 // Returns an object containing city information from LocationIQ API
-function searchLocation(request, response) {
-    const city = request.query.city;
-    const url = 'https://us1.locationiq.com/v1/search.php';
+function searchLocation(response, city) {
     const parameters = {
         key: process.env.GEOCODE_API_KEY,
         q: city,
@@ -54,16 +54,14 @@ function searchLocation(request, response) {
     };
 
     superagent
-        .get(url)
+        .get('https://us1.locationiq.com/v1/search.php')
         .query(parameters)
         .then(data => {
-            const geoData = data.body[0];
-            const location = new Location(city, geoData);
-            console.log(location);
+            const location = new Location(city, data.body[0]);
             saveLocation(location);
             response.status(200).send(location);
         })
-        .catch(error => handleInternalError(request, response, error));
+        .catch(error => handleInternalError(response, error));
 }
 
 // Saves the new city infromation to the database
@@ -73,7 +71,7 @@ function saveLocation(location) {
     
     client
         .query(sql, value)
-        .catch(error => handleInternalError(error));
+        .catch(error => handleInternalError(response, error));
 }
 
 // A constructor function that converts the search query to a latitude and longitude
@@ -87,29 +85,27 @@ function Location(city, geoData) {
 // Handler function for the GET /weather route
 // Return an array of objects for each day of the response which contains the necessary information for correct client rendering
 function getWeather(request, response) {
-    const city = request.query;
-    const url = 'https://api.weatherbit.io/v2.0/forecast/daily';
+    console.log(request);
     const parameters = {
         key: process.env.WEATHER_API_KEY,
-        lat: city.latitude,
-        lon: city.longitude
+        lat: request.query.latitude,
+        lon: request.query.longitude
     };
 
     superagent
-        .get(url)
+        .get('https://api.weatherbit.io/v2.0/forecast/daily')
         .query(parameters)
         .then(data => {
-            const weatherData = data.body.data;
-            const forecast = weatherData.map(weather => new Weather(weather)); 
+            const forecast = data.body.data.map(weather => new Weather(weather)); 
             response.status(200).send(forecast);
         })
-        .catch(error => handleInternalError(request, response, error));
+        .catch(error => handleInternalError(response, error));
 }
 
 // A constructor function that converts an object to a weather object
-function Weather(obj) {
-    this.forecast = obj.weather.description;
-    this.time = this.formattedDate(obj.valid_date);
+function Weather(weather) {
+    this.forecast = weather.weather.description;
+    this.time = this.formattedDate(weather.valid_date);
 }
 
 // A prototype that converts time into a date
@@ -118,50 +114,117 @@ Weather.prototype.formattedDate = function(valid_date) {
     return date.toDateString();
 }
 
+// Handler function for the GET /trails route
+// Return an array of trail objects which contains the necessary information for correct client rendering
+function getTrails(request, response) {
+    const parameters = {
+        key: process.env.TRAIL_API_KEY,
+        lat: request.query.latitude,
+        lon: request.query.longitude
+    };
+
+    superagent
+        .get('https://www.hikingproject.com/data/get-trails')
+        .query(parameters)
+        .then(data => {
+            const trails = data.body.trails.map(trail => new Trail(trail)); 
+            response.status(200).send(trails);
+        })
+        .catch(error => handleInternalError(response, error));
+}
+
+// A constructor function for trail
+function Trail(trail) {
+    this.name = trail.name;
+    this.location = trail.location;
+    this.length = trail.length;
+    this.stars = trail.stars;
+    this.star_votes = trail.starVotes;
+    this.summary = trail.summary;
+    this.trail_url = trail.trail_url;
+    this.conditions = trail.conditionDetails;
+    this.condition_date = trail.conditionDate.split(" ")[0];
+    this.condition_time = trail.conditionDate.split(" ")[1];
+}
+
+// Handler function for the GET /movies route
+// Return an array of movie objects which contains the necessary information for correct client rendering
 function getMovies(request, response) {
-    const city = request.query.search_query;
-    const url = 'https://api.themoviedb.org/3/search/movie';
     const parameters = {
         api_key: process.env.MOVIE_API_KEY,
-        query: 'seattle',
+        query: request.query.search_query,
         page: 1
     };
 
     superagent
-        .get(url)
+        .get('https://api.themoviedb.org/3/search/movie')
         .query(parameters)
         .then(data => {
-            const movieData = data.body.results;
-            const movies = movieData.map(movie => new Movie(movie)); 
+            const movies = data.body.results.map(movie => new Movie(movie)); 
             response.status(200).send(movies);
         })
-        .catch(error => handleInternalError(request, response, error));
+        .catch(error => handleInternalError(response, error));
 }
 
-// A constructor function that converts an object to a weather object
-function Movie(obj) {
-    this.title = obj.title;
-    this.overview = obj.overview;
-    this.average_votes = obj.vote_average;
-    this.total_votes = obj.vote_count;
-    this.image_url = obj.poster_path ? `https://image.tmdb.org/t/p/w500${obj.poster_path}` : 'https://via.placeholder.com/500';
-    this.popularity = obj.popularity;
-    this.released_on = obj.release_date;
+// A constructor function for movie object
+function Movie(movie) {
+    this.title = movie.title;
+    this.overview = movie.overview;
+    this.average_votes = movie.vote_average;
+    this.total_votes = movie.vote_count;
+    this.image_url = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750';
+    this.popularity = movie.popularity;
+    this.released_on = movie.release_date;
+}
+
+// Handler function for the GET /yelp route
+// Return an array of restaurant objects which contains the necessary information for correct client rendering
+function getRestaurants(request, response) {
+    const paginate = 5;
+    const page = request.query.page || 1;
+    const start = ((page - 1) * paginate + 1);
+
+    const parameters = {
+        term: 'restaurants',
+        latitude: request.query.latitude,
+        longitude: request.query.longitude,
+        limit: 5,
+        offset: start
+    };
+
+    superagent
+        .get('https://api.yelp.com/v3/businesses/search')
+        .auth(process.env.YELP_API_KEY, { type: 'bearer' })
+        .query(parameters)
+        .then(data => {
+            const restaurants = data.body.businesses.map(restaurant => new Restaurant(restaurant)); 
+            response.status(200).send(restaurants);
+        })
+        .catch(error => handleInternalError(response, error));
+}
+
+// A constructor function for restaurant object
+function Restaurant(restaurant) {
+    this.name = restaurant.name;
+    this.image_url = restaurant.image_url;
+    this.price = restaurant.price;
+    this.rating = restaurant.rating;
+    this.url = restaurant.url;
 }
 
 // Handler function for the GET / route
-function getIndex(request, response) {
+function getIndex(response) {
     response.status(200).send('Pair this backend with: https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end');
 }
 
 // Handler function for internal errors
-function handleInternalError(request, response, error) {
+function handleInternalError(response, error) {
     console.log('ERROR', error);
     response.status(500).send('Sorry, something went wrong');
 }
 
 // Handler function for all other errors
-function catchAll(request, response) {
+function catchAll(response) {
     response.status(404).send('404 Not Found D:');
 }
 
