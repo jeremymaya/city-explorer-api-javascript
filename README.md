@@ -68,10 +68,10 @@ YELP_API_KEY=API_KEY
 DATABASE_URL=CONNECTION_STRING
 ```
 
-Navigate to the [data](/data) folder and enter the following command to run the SQL script:
+Navigate to the [data](/data) folder and enter the following command to run the SQL script (below step uses Heroku Postgres):
 
 ```bash
-
+heroku pg:psql -a APP_NAME < SQL_SCRIPT_NAME
 ```
 
 Start the application in development mode with the following command:
