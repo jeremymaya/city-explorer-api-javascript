@@ -108,6 +108,10 @@ The endpoint deployed from this project is accessible at <https://city-explorer-
 
 The above endpoint can be rendered at [City Explorer app's welcome page](https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end/).
 
+### Reset Heroku Postgres
+
+To reset the Heroku Postgres, follow the instruction from [Database Deployment Instruction](https://gist.github.com/jeremymaya/9da0b66eac3d35ff8803973492eff9e9).
+
 ---
 
 ## Endpoints
@@ -118,17 +122,17 @@ The above endpoint can be rendered at [City Explorer app's welcome page](https:/
 |:-|:-|:-|
 | GET | `/location` | |
 
-Test the functionality of the `/location` endpoint running at `localhost:3000` with the following command:
+Test the functionality of the `/location` endpoint with the following command:
 
 ```bash
-curl -X GET 'http://localhost:3000/location?city=seattle'
+curl -X GET 'https://city-explorer-api-javascript.herokuapp.com/location?city=seattle'
 ```
 
 ```json
 Sample Response of GET /location
 
 {
-    "id":1, (if retreived from the database)
+    "id":1, // if retreived from the database
     "search_query":"seattle",
     "formatted_query":"Seattle, WA, USA",
     "latitude":47.6062095,
@@ -142,10 +146,10 @@ Sample Response of GET /location
 |:-|:-|:-|
 | GET | `/weather` | |
 
-Test the functionality of the `/weather` endpoint running at `localhost:3000` with the following command:
+Test the functionality of the `/weather` endpoint with the following command:
 
 ```bash
-curl -X GET 'http://localhost:3000/weather?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+curl -X GET 'https://city-explorer-api-javascript.herokuapp.com/weather?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
 ```
 
 ```json
@@ -165,10 +169,10 @@ Sample Response of GET /weather
 |:-|:-|:-|
 | GET | `/trails` | |
 
-Test the functionality of the `/trails` endpoint running at `localhost:3000` with the following command:
+Test the functionality of the `/trails` endpoint with the following command:
 
 ```bash
-curl -X GET 'http://localhost:3000/trails?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+curl -X GET 'https://city-explorer-api-javascript.herokuapp.com/trails?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
 ```
 
 ```json
@@ -195,10 +199,10 @@ Sample Response of GET /trails
 |:-|:-|:-|
 | GET | `/movies` | |
 
-Test the functionality of the `/movies` endpoint running at `localhost:3000` with the following command:
+Test the functionality of the `/movies` endpoint running with the following command:
 
 ```bash
-curl -X GET 'http://localhost:3000/movies?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
+curl -X GET 'https://city-explorer-api-javascript.herokuapp.com/movies?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
 ```
 
 ```json
@@ -223,11 +227,7 @@ Sample Response of GET /movies
 |:-|:-|:-|
 | GET | `/yelp` | |
 
-Test the functionality of the `/yelp` endpoint running at `localhost:3000` with the following command:
-
-```bash
-curl -X GET 'http://localhost:3000/yelp?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'
-```
+Test the functionality of the `/yelp` endpoint with the following command:
 
 ```bash
 curl -X GET 'https://city-explorer-api-javascript.herokuapp.com/yelp?search_query=seattle&formatted_query=Seattle%2C%20WA%2C%20USA&latitude=47.6062095&longitude=-122.3320708'

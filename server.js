@@ -7,6 +7,8 @@ require('dotenv').config();
 const express = require('express');
 const superagent = require('superagent');
 const pg = require('pg');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 const cors = require('cors');
 
 // Postgres Setup
@@ -213,7 +215,7 @@ function Restaurant(restaurant) {
 }
 
 // Handler function for the GET / route
-function getIndex(response) {
+function getIndex(request, response) {
     response.status(200).send('Pair this backend with: https://codefellows.github.io/code-301-guide/curriculum/city-explorer-app/front-end');
 }
 
@@ -224,12 +226,15 @@ function handleInternalError(response, error) {
 }
 
 // Handler function for all other errors
-function catchAll(response) {
+function catchAll(request, response) {
     response.status(404).send('404 Not Found D:');
 }
 
 // Connect to Postgres then start the server
 client
     .connect()
-    .then(() => app.listen(PORT, () => console.log(`Endpoint: http://localhost:${PORT}`)))
+    .then(() => {
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+        app.listen(PORT, () => console.log(`Endpoint: http://localhost:${PORT}`));
+    })
     .catch(error => handleInternalError(error));
